@@ -1,0 +1,48 @@
+<div class="grid">
+	<div class="col-12 xl:col-12">
+		<div class="card">
+			<ng-template [ngIf]="loading" [ngIfElse]="showTable">
+				<skeleton-table-component [title]="title"></skeleton-table-component>
+			</ng-template>
+
+			<ng-template #showTable>
+					<p-table #dt [value]="document" [paginator]="true"  [rows]="6"
+					responsiveLayout="scroll"  styleClass="p-datatable-sm p-datatable-gridlines" [globalFilterFields]="['id','name']">
+						<ng-template pTemplate="header">
+							<tr>
+								<th pSortableColumn="id">Id <p-sortIcon field="id"></p-sortIcon> <p-columnFilter type="text" field="id" display="menu" class="ml-auto" ></p-columnFilter></th>
+								<th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon> <p-columnFilter type="text" field="description" display="menu" class="ml-auto"></p-columnFilter></th>
+								<th>Editar</th>
+                                <th>Eliminar</th>
+							</tr>
+						</ng-template>
+							<ng-template pTemplate="caption">
+                                <h4 class="mt-2">{{title}}</h4>
+								<div class="flex">
+									<button pButton  class="ml-2" pRipple type="button" (click)="addEDocument()" pTooltip="Agregar nuevo Documento" tooltipPosition="bottom" label="Agregar" ></button>
+
+                                    <span class="p-input-icon-left ml-auto">
+										<i class="pi pi-search"></i>
+										<input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Buscar una Documento" />
+									</span>
+								</div>
+							</ng-template>
+						<ng-template pTemplate="body" let-document>
+							<tr>
+								<td style="width: 10%; min-width: 2rem;">{{document.id }}</td>
+								<td style="width: 35%; min-width: 7rem;">{{document.name}}</td>
+								<td style="width: 20%;">
+									<button (click)="editDocument(document)" pButton pRipple type="button" icon="pi pi-pencil" class="p-button p-component p-button-text p-button-icon-only"></button>
+								</td>
+                                <td style="width: 20%;">
+									<button (click)="deleteDocument(document)" pButton pRipple type="button" icon="pi pi-trash" class="p-button p-component p-button-text p-button-icon-only"></button>
+								</td>
+							</tr>
+						</ng-template>
+					</p-table>
+                    <app-document-type-dialog (DocumentModify)="documentModify($event)"></app-document-type-dialog>
+			</ng-template>
+		</div>
+	</div>
+</div>
+

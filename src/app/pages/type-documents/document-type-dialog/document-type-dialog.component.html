@@ -1,0 +1,44 @@
+<p-dialog header="{{ isAdd ? 'Agregar' : 'Editar' }} Documento" [(visible)]="display" modal="true" blockScroll="true" [style]="{width: '50vw'}">
+    <ng-template [ngIf]="loading" [ngIfElse]="data">
+        Cargando...
+    </ng-template>
+    <ng-template #data>
+        <form [formGroup]="formDocument" *ngIf="formDocument" class="mb-5">
+            <div class="grid p-fluid">
+
+                <div class="col-12 md:col-6">
+                    <span class="mt-4 p-float-label p-input-icon-left">
+                        <i class="pi pi-user"></i>
+                        <input id="id" type="number" pInputText formControlName="id" [ngClass]="{ 'is-invalid': submitted && f.id.errors }" disabled>
+                        <label for="id">ID</label>
+                    </span>
+                    <div *ngIf="formDocument.controls['id'].invalid && formDocument.controls['id'].dirty">
+                        <small *ngIf="formDocument.controls['id'].errors.required" id="id" class="p-error block">ID es requerido</small>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <span class="mt-4 p-float-label p-input-icon-left">
+                        <i class="pi pi-user"></i>
+                        <input id="name" type="text" pInputText formControlName="name" [ngClass]="{ 'is-invalid': submitted && f.name.errors }">
+                        <label for="name">Nombre</label>
+                    </span>
+                    <div *ngIf="formDocument.controls['name'].invalid && formDocument.controls['name'].dirty">
+                        <small *ngIf="formDocument.controls['name'].errors.required" id="name" class="p-error block">Nombre es requerido</small>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+        <br><br><br><br>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+        <ng-template [ngIf]="isAdd" [ngIfElse]="addButton">
+            <button pButton type="button" [disabled]="formDocument.invalid || loading" (click)="addDocument()" label="Agregar"></button>
+        </ng-template>
+        <ng-template #addButton>
+            <button pButton type="button" [disabled]="formDocument.invalid || loading" (click)="editDocument()" label="Editar"></button>
+        </ng-template>
+    </ng-template>
+</p-dialog>

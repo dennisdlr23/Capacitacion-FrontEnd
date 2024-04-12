@@ -1,0 +1,25 @@
+<p-dialog  header="Listado de Articulos" [(visible)]="display"
+modal="true" blockScroll="true" [style]="{width: '50vw'}">
+    <ng-template [ngIf]="loading" [ngIfElse]="data">
+        Cargando...
+    </ng-template>
+    <ng-template #data>
+        <p-table #dt [value]="itemList" selectionMode="single" dataKey="code" [paginator]="true"  [rows]="5"
+        responsiveLayout="scroll"  styleClass="p-datatable-sm p-datatable-gridlines" [globalFilterFields]="['id','docDate','cardCode', 'reference', 'docTotal']">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="code">Codigo <p-sortIcon field="code"></p-sortIcon> <p-columnFilter type="text" field="code" display="menu" class="ml-auto" ></p-columnFilter></th>
+                    <th pSortableColumn="name">Nombre <p-sortIcon field="name"></p-sortIcon> <p-columnFilter type="text" field="name" display="menu" class="ml-auto"></p-columnFilter></th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-item>
+                <tr (click)="selectItem(item)">
+                    <td style="width: 10%; min-width: 2rem;">{{item.code }}</td>
+                    <td style="width: 35%; min-width: 7rem;">{{item.name}}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+    </ng-template>
+</p-dialog>

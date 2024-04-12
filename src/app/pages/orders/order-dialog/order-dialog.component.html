@@ -1,0 +1,119 @@
+<p-dialog  header="Crear pedido de compra" [(visible)]="display"
+modal="true" blockScroll="true" [style]="{width: '50vw'}">
+    <ng-template [ngIf]="loading" [ngIfElse]="data">
+        Cargando...
+    </ng-template>
+    <ng-template #data>
+        <form [formGroup]="formOrder" *ngIf="formOrder" class="mb-5">
+            <div class="grid p-fluid">
+                <div class="col-12 md:col-12">
+                    <span class="mt-4 p-float-label p-input-icon-left">
+                        <div class="p-inputgroup">
+                            <button [disabled]="disabled" type="button" pButton pRipple icon="pi pi-search"
+                                (click)="showDialogSupplier()"></button>
+                            <input id="cardCode" [disabled]="disabled" type="text" pInputText
+                                formControlName="cardCode" [attr.disabled]="true" placeholder="Buscar Proveedor"
+                                [ngClass]="{ 'is-invalid': submitted && f.name.errors }">
+                            <input [disabled]="disabled" id="cardName" type="text" pInputText
+                                formControlName="cardName" [attr.disabled]="true"
+                                [ngClass]="{ 'is-invalid': submitted && f.name.errors }" placeholder="">
+                        </div>
+                    </span>
+                    <div
+                        *ngIf="formOrder.controls['cardName'].invalid && formOrder.controls['cardName'].dirty">
+                        <small *ngIf="formOrder.controls['cardName'].errors.required" id="cardName"
+                            class="p-error block">Proveedor es requerido</small>
+                    </div>
+                </div>
+                <div class="col-12 md:col-12">
+                    <span class="mt-4 p-float-label p-input-icon-left">
+                        <i class="pi pi-user"></i>
+                        <input id="reference" type="text" pInputText  formControlName="reference" [ngClass]="{ 'is-invalid': submitted && f.reference.errors }">
+                        <label for="reference">Referencia</label>
+                    </span>
+                    <div *ngIf="formOrder.controls['reference'].invalid && formOrder.controls['reference'].dirty" >
+                        <small  *ngIf="formOrder.controls['reference'].errors.required" id="reference" class="p-error block">Nombre es requerido</small>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-12">
+                    <button type="button" pButton pRipple icon="pi pi-search"
+                    label="Buscar productos"
+                    pTooltip="Buscar Productos" tooltipPosition="bottom"
+                    (click)="showDialogItem()"></button>
+                </div>
+                <div class="col-12 md:col-12">
+                    <p-table #dt [value]="orderDetail" [paginator]="true"  [rows]="5"
+                    responsiveLayout="scroll"  styleClass="p-datatable-sm p-datatable-gridlines" [globalFilterFields]="['itemCode','cardCode', 'docNum', 'docTotal']">
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th pSortableColumn="itemCode">Codigo <p-sortIcon field="itemCode"></p-sortIcon> <p-columnFilter type="text" field="id" display="menu" class="ml-auto" ></p-columnFilter></th>
+                                <th pSortableColumn="itemName">Descripcion <p-sortIcon field="itemName"></p-sortIcon> <p-columnFilter type="text" field="cardCode" display="menu" class="ml-auto"></p-columnFilter></th>
+                                <th pSortableColumn="quantity">Cantidad <p-sortIcon field="quantity"></p-sortIcon><p-columnFilter type="text" field="quantity" display="menu" class="ml-auto"></p-columnFilter></th>
+                                <th pSortableColumn="price">Precio <p-sortIcon field="price"></p-sortIcon><p-columnFilter type="text" field="price" display="menu" class="ml-auto"></p-columnFilter></th>
+                                <th pSortableColumn="lineTotal">Total <p-sortIcon field="lineTotal"></p-sortIcon><p-columnFilter type="text" field="lineTotal" display="menu" class="ml-auto"></p-columnFilter></th>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-order>
+                            <tr>
+                                <td style="width: 10%; min-width: 2rem;">{{order.itemCode }}</td>
+                                <td style="width: 35%; min-width: 7rem;">{{order.itemName}}</td>
+                                <td pEditableColumn style="width: 25%; min-width: 4rem;">
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <input pInputText type="number"
+                                            [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="order.quantity"
+                                            [min]="1"
+                                            [max]="10000"
+                                            (ngModelChange)="calculate()">
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{order.quantity}}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td pEditableColumn style="width: 25%; min-width: 4rem;">
+                                    <p-cellEditor>
+                                        <ng-template pTemplate="input">
+                                            <input pInputText type="number"
+                                            [min]="1"
+                                            [ngModelOptions]="{standalone: true}"
+                                            [(ngModel)]="order.price"
+                                            (ngModelChange)="calculate()">
+                                        </ng-template>
+                                        <ng-template pTemplate="output">
+                                            {{order.price | currency: 'L.'}}
+                                        </ng-template>
+                                    </p-cellEditor>
+                                </td>
+                                <td style="width: 35%; min-width: 5rem;">{{order.lineTotal | currency: 'L.'}}</td>
+                            </tr>
+                        </ng-template>
+                        <ng-template pTemplate="footer">
+                            <tr>
+                                <td>Total: </td>
+                                <td></td>
+                                <td>{{totalQty}}</td>
+                                <td></td>
+                                <td>{{total | currency:'L.'}}</td>
+
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </form>
+        <br><br><br><br>
+        <app-supplier-list (SupplierSelect)="selectSupplier($event)" ></app-supplier-list>
+        <app-item-list (itemSelect)="selectItem($event)"></app-item-list>
+    </ng-template>
+    <ng-template pTemplate="footer">
+        <ng-template [ngIf]="isAdd" [ngIfElse]="addButton">
+            <button pButton type="button" [disabled]="formOrder.invalid || loading" (click)="add()" label="Agregar" ></button>
+        </ng-template>
+        <ng-template #addButton>
+            <button pButton type="button" [disabled]="formOrder.invalid || loading" (click)="edit()" label="Editar" ></button>
+        </ng-template>
+    </ng-template>
+</p-dialog>
